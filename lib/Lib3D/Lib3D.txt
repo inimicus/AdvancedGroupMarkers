@@ -1,0 +1,13 @@
+## Title: Lib3D-v3
+## Author: Shinni
+## Version: 3.3
+## AddOnVersion: 33
+## APIVersion: 100025
+## DependsOn: LibGPS
+## SavedVariables: Lib3D_SavedVars
+
+Lib3D.lua
+GlobalToWorldFactors.lua
+
+##example/example.xml
+##example/example.lua
