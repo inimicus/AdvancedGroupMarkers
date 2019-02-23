@@ -17,9 +17,10 @@ AvGM.prefix     = "[AvGM] "
 local EM = EVENT_MANAGER
 local WM = WINDOW_MANAGER
 
-local GPS = LibStub("LibGPS2")
-local PATH = "Lib3D/example"
 Example = {}
+
+local measurementControl = CreateControl(AvGM.name .. "MeasurementControl", GuiRoot, CT_CONTROL)
+measurementControl:Create3DRenderSpace()
 
 -- -----------------------------------------------------------------------------
 -- Level of debug output
@@ -57,11 +58,6 @@ function AvGM.Initialize(event, addonName)
 
     AvGM:Trace(2, "Finished Initialize()")
 
-    local unit = ZO_Group_GetUnitTagForGroupIndex(1)
-    d(GetUnitName(unit))
-    --d(GetUnitWorldPosition(unit))
-    d(GetMapPlayerPosition(unit))
-
     --local MageLight_TopLevel = WM:CreateTopLevelWindow("MageLight_TopLevel")
     local MageLight_TopLevel = WM:CreateControl("MageLight_TopLevel", GuiRoot, CT_TOPLEVELCONTROL)
     MageLight_TopLevel:Create3DRenderSpace()
@@ -71,28 +67,12 @@ function AvGM.Initialize(event, addonName)
     HUD_SCENE:AddFragment(fragment)
     LOOT_SCENE:AddFragment(fragment)
 
-    -- register a callback, so we know when to start/stop displaying the mage light
-    Lib3D:RegisterWorldChangeCallback("MageLight", function(identifier, zoneIndex, isValidZone, newZone)
-        if not newZone then return end
-        
-        if isValidZone then
-            Example.ShowMageLight()
-        else
-            Example.HideMageLight()
-        end
-    end)
-    
-    -- create the mage light
-    -- we have one parent control (light) which we will move around the player
-    -- and two child controls for the light's center and a periodically pulsing sphere
     light = WM:CreateControl(nil, MageLight_TopLevel, CT_CONTROL)
     center = WM:CreateControl(nil, light, CT_TEXTURE)
     
-    -- make the control 3 dimensional
     light:Create3DRenderSpace()
     center:Create3DRenderSpace()
     
-    -- set texture, size and enable the depth buffer so the mage light is hidden behind world objects
     -- esoui/art/lfg/gamepad/lfg_roleicon_tank.dds
     -- esoui/art/lfg/gamepad/lfg_roleicon_healer.dds
     center:SetTexture("/esoui/art/lfg/gamepad/lfg_roleicon_dps.dds")
@@ -101,7 +81,7 @@ function AvGM.Initialize(event, addonName)
     center:Set3DRenderSpaceUsesDepthBuffer(true)
     center:Set3DRenderSpaceOrigin(0,0,0.1)
 
-    --MageLight_TopLevel:Set3DRenderSpaceOrigin(worldX, worldY, worldZ)
+    Example.ShowMageLight()
 end
 
 function Example.ShowMageLight()
@@ -109,41 +89,26 @@ function Example.ShowMageLight()
     center:SetHidden(false)
     
     EM:UnregisterForUpdate("MageLight")
-    -- perform the following every single frame
+
     EM:RegisterForUpdate("MageLight", 0, function(time)
         
-        local x, y, z, forwardX, forwardY, forwardZ, rightX, rightY, rightZ, upX, upY, upZ = Lib3D:GetCameraRenderSpace()
+        Set3DRenderSpaceToCurrentCamera(measurementControl:GetName())
+        local x, y, z = measurementControl:Get3DRenderSpaceOrigin()
+        local forwardX, forwardY, forwardZ = measurementControl:Get3DRenderSpaceForward()
+        local rightX, rightY, rightZ = measurementControl:Get3DRenderSpaceRight()
+        local upX, upY, upZ = measurementControl:Get3DRenderSpaceUp()
         
         -- align our mage light with the camera's render space so the light is always facing the camera
         light:Set3DRenderSpaceForward(forwardX, forwardY, forwardZ)
         light:Set3DRenderSpaceRight(rightX, rightY, rightZ)
         light:Set3DRenderSpaceUp(upX, upY, upZ)
-        
-        -- get the player position, so we can place the mage light nearby
-        local worldX, worldY, worldZ = Lib3D:ComputePlayerRenderSpacePosition()
-        if not worldX then return end
-        -- this creates the circeling motion around the player
-        local time = GetFrameTimeSeconds()
-        --worldX = worldX + math.sin(time)
-        --worldZ = worldZ + math.cos(time)
-        --worldY = worldY - 0.75 + 0.5 * math.sin(0.5 * time)
-        worldX = worldX
-        worldZ = worldZ
-        worldY = worldY + 0.5
 
-        -- Group member?
         local unit = ZO_Group_GetUnitTagForGroupIndex(1)
-        local playerPos = GetMapPlayerPosition(unit)
-        local globalX, globalY = GPS:LocalToGlobal(GetMapPlayerPosition(unit))
-        local worldX, worldZ = Lib3D:GlobalToWorld(globalX, globalY)
-        worldX, _, worldZ = WorldPositionToGuiRender3DPosition(worldX * 100, 0, worldZ * 100)
-        --
-        worldY = worldY + 0.5
+        local zoneId, worldX, worldY, worldZ = GetUnitWorldPosition("player")
+        worldX, worldY, worldZ = WorldPositionToGuiRender3DPosition(worldX, worldY, worldZ)
+        worldY = worldY + 2.75
 
         MageLight_TopLevel:Set3DRenderSpaceOrigin(worldX, worldY, worldZ)
-        
-        -- add a pulsing animation
-        --center:SetAlpha(math.sin(2 * time) * 0.25 + 0.75)
         
     end)
 end

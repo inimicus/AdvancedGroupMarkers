@@ -4,11 +4,5 @@
 ## Description: Fancy group markers for all your grouping needs.
 ## Version: 0.0.1
 ## Author: |cFFCCCC@g4rr3t|r (NA)
-## DependsOn: LibStub Lib3D LibGPS
-
-lib/LibStub/LibStub.lua
-lib/LibMapPing/LibMapPing.lua
-lib/LibGPS/LibGPS.lua
-##lib/Lib3D/Lib3D.lua
 
 src/Main.lua
