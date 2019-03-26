@@ -1,5 +1,5 @@
 -- -----------------------------------------------------------------------------
--- Advanced Group Markets
+-- Advanced Group Markers
 -- Author:  g4rr3t
 -- Created: February 22, 2019
 --
@@ -8,28 +8,9 @@
 
 AvGM.UI = {}
 
---EVENT_GROUP_MEMBER_ROLE_CHANGED (*string* _unitTag_, *[LFGRole|#LFGRole]* _newRole_)
---EVENT_GROUP_UPDATE
---GetGroupSize()
---IsUnitGrouped(*string* _unitTag_)
---GetGroupUnitTagByIndex(*luaindex* _sortIndex_)
---GetGroupIndexByUnitTag(*string* _unitTag_)
---IsGroupMemberInRemoteRegion(*string* _unitTag_)
---GetGroupMemberSelectedRole(*string* _unitTag_)
---ZO_Group_GetUnitTagForGroupIndex
---
---IsGroupMemberInSameInstanceAsPlayer(GetGroupUnitTagByIndex(1))
-
---Set3DRenderSpaceOrigin(*number* _xM_, *number* _yM_, *number* _zM_)
---* GetMapPlayerPosition(*string* _unitTag_)
---** _Returns:_ *number* _normalizedX_, *number* _normalizedZ_, *number* _heading_, *bool* _isShownInCurrentMap_
---* GetUnitWorldPosition(*string* _unitTag_)
---** _Returns:_ *integer* _zoneId_, *integer* _worldX_, *integer* _worldY_, *integer* _worldZ_
-
 local EM = EVENT_MANAGER
 local WM = WINDOW_MANAGER
 
-local light, center, groupMarkersTop
 local measurementControl = CreateControl(AvGM.name .. "MeasurementControl", GuiRoot, CT_CONTROL)
 measurementControl:Create3DRenderSpace()
 
